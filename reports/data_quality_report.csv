@@ -1,0 +1,4 @@
+feature,original_zero_count,converted_to_missing_count,remaining_missing_count,decision,reason
+chol,172,172,0,converted_to_nan_and_imputed,Zero cholesterol is not physiologically plausible for serum cholesterol; treated as unrecorded measurement from historical Hungarian/VA cohorts and imputed via training median with missingness indicator.
+trestbps,0,0,0,preserved_valid_range,Resting blood pressure in dataset ranges from 80 to 200 mm Hg; all values are valid clinical measurements.
+oldpeak,0,0,0,preserved_without_modification,Negative ST depression values (12 observations, min -2.6 mm) occur in clinical ECG recordings due to baseline shifts; preserved without modification as clinically valid.

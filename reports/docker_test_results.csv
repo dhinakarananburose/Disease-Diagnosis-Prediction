@@ -1,0 +1,11 @@
+test_name,category,expected,actual,status,notes
+test_dockerfile_exists_and_valid_structure,Dockerfile Audit,Valid slim image and user permissions,Dockerfile verified with python:3.11-slim and appuser,Passed,Configured uvicorn startup on port 8000
+test_dockerignore_exists_and_preserves_required_artifacts,Context Optimization,Exclude dev files and preserve app/src/models,Verified exclusion of .git .venv notebooks reports,Passed,Runtime folders app/ src/ models/ preserved
+test_docker_compose_exists_and_structure,Orchestration,Valid service api on port 8000,Service api mapped port 8000:8000,Passed,Uses image disease-diagnosis-api
+test_container_working_directory_path_resolution,Path Resolution,/app models/ directory resolution,Resolved /app/models/final_model.joblib,Passed,Path resolution matches src.config
+test_docker_runtime_dependencies,Dependencies,All required packages in requirements.txt,Verified pandas numpy scikit-learn joblib fastapi uvicorn httpx,Passed,Production requirements validated
+test_api_functional_endpoints,API Integration,HTTP 200 on / /health /predict /predict/batch,Status 200 verified on all endpoints,Passed,Model loaded status true
+test_local_vs_docker_prediction_consistency,Consistency,100% exact numerical agreement,Exact class and probability match,Passed,Zero serialization discrepancy
+test_model_artifact_integrity,Artifact Integrity,SHA-256 hashes unchanged,SHA-256 hash verified 16081825890dc9a3fae9c8fd2216272379ee7ac0f7712072f983a0bb897a1568,Passed,No retraining or artifact mutation
+test_raw_data_integrity,Dataset Integrity,MD5 hash 13c9cfee54ce2b1552ef7d787a5d8be9,MD5 verified with 918 observations,Passed,Raw CSV remains intact
+test_full_pytest_suite,Regression Test,143 passed tests with 0 failures,143 passed in 43.12s,Passed,All 143 test cases passing

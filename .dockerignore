@@ -1,0 +1,26 @@
+# Git and VCS
+.git
+.gitignore
+.github
+
+# Virtual environment and Python caches
+.venv
+venv/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Development notebooks and reports (not needed for runtime API container)
+notebooks/
+reports/
+scratch/
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+.DS_Store
+*.log

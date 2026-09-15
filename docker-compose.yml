@@ -1,0 +1,10 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: disease-diagnosis-api
+    container_name: disease-diagnosis-api-container
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

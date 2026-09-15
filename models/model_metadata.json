@@ -1,0 +1,38 @@
+{
+    "project_name": "Disease Diagnosis Prediction",
+    "model_name": "Tuned Support Vector Machine",
+    "model_type": "SVC",
+    "hyperparameters": {
+        "C": 100,
+        "kernel": "linear",
+        "gamma": "scale",
+        "probability": true,
+        "random_state": 42
+    },
+    "preprocessing_description": "Median imputation for missing numericals (chol), standard scaling, and drop=None one-hot encoding for categorical variables.",
+    "training_sample_count": 734,
+    "test_sample_count": 184,
+    "number_of_input_features": 10,
+    "feature_names": [
+        "age",
+        "trestbps",
+        "chol",
+        "thalch",
+        "oldpeak",
+        "sex",
+        "cp",
+        "restecg",
+        "fbs",
+        "exang"
+    ],
+    "random_state": 42,
+    "test_split_configuration": {
+        "test_size": 0.2,
+        "stratify": true,
+        "random_state": 42
+    },
+    "model_selection_reference": "Phase 8 Final Model Selection",
+    "creation_timestamp": "2026-09-15T11:13:01.059423+00:00",
+    "sklearn_version": "1.6.1",
+    "joblib_version": "1.4.2"
+}

@@ -1,0 +1,13 @@
+Feature,Logistic_Absolute_Coefficient,Random_Forest_Importance,Appears_Important_Logistic,Appears_Important_RF,Appears_Important_Both
+cat__cp_asymptomatic,0.9671481187868607,0.12195599534882277,True,True,True
+bool__exang,0.9394658251188894,0.06881620738926891,True,True,True
+cat__cp_typical angina,0.7248263082550299,0.045071653408755324,True,True,True
+cat__sex_Female,0.6531512423105824,0.02908585019400405,True,True,True
+num__missingindicator_chol,0.5564545449081876,0.04455354759517609,True,True,True
+num__oldpeak,0.5282538581509071,0.11541310933890957,True,True,True
+num__thalch,0.3383827444609068,0.13711494654950038,True,True,True
+num__age,0.2802650438760502,0.128824278450305,True,True,True
+cat__sex_Male,0.6441420814640619,0.02443270177697568,True,False,False
+bool__fbs,0.4070672647769206,0.01624463668710183,True,False,False
+num__chol,0.22635012852760983,0.11209127295731028,False,True,False
+num__trestbps,0.046361401311759726,0.08847915289957033,False,True,False

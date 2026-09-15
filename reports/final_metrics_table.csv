@@ -1,0 +1,8 @@
+model,stage,accuracy,precision,recall,f1,roc_auc,notes
+Logistic Regression,Baseline,0.8370,0.8462,0.8627,0.8544,0.9278,Baseline model defaults
+K-Nearest Neighbors,Baseline,0.8424,0.8411,0.8824,0.8612,0.8998,Baseline model defaults
+Decision Tree,Baseline,0.7120,0.7379,0.7451,0.7415,0.7079,Baseline model defaults
+Random Forest,Baseline,0.8152,0.8269,0.8431,0.8350,0.9112,Baseline model defaults
+Support Vector Machine,Baseline,0.8370,0.8333,0.8824,0.8571,0.9114,Baseline model defaults
+Logistic Regression,Tuned,0.8261,0.8302,0.8627,0.8462,0.9273,GridSearchCV tuned (C=0.1 solver=lbfgs max_iter=1000)
+Support Vector Machine,Final Selected,0.8478,0.8558,0.8725,0.8641,0.9295,Final selected model (C=100 kernel=linear gamma=scale probability=True)
