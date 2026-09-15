@@ -4,10 +4,10 @@
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.4+-orange.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green.svg)
 ![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)
-![Tests](https://img.shields.io/badge/Tests-142%20Passed-brightgreen.svg)
+![Tests](https://img.shields.io/badge/Tests-170%20Passed-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-Production-structured, end-to-end machine learning system for heart disease risk classification built on clinical data ($N=918$). The project features a leakage-safe preprocessing pipeline, comprehensive benchmarking across 5 classification algorithms, hyperparameter-tuned Support Vector Machine (`SVC`), automated model persistence, a reusable prediction module, a RESTful FastAPI microservice with Pydantic schema validation, and lightweight Docker containerization verified with 142 automated unit tests.
+Production-structured, end-to-end machine learning system for heart disease risk classification built on clinical data ($N=918$). The project features a leakage-safe preprocessing pipeline, comprehensive benchmarking across 5 classification algorithms, hyperparameter-tuned Support Vector Machine (`SVC`), automated model persistence, a reusable prediction module, a RESTful FastAPI microservice with Pydantic schema validation, and lightweight Docker containerization verified with 170 automated unit tests.
 
 > [!WARNING]
 > **Non-Clinical Disclaimer**: This application is a machine-learning research prototype developed to demonstrate software design and predictive modeling workflows. It is **not a clinically validated diagnostic system** and must not be used for medical diagnosis or clinical decision-making.
@@ -106,7 +106,7 @@ Docker Containerization ──► python:3.11-slim Container (Non-root appuser e
 3. **Encapsulated Pipeline Persistence**: The fitted preprocessor and classifier are saved as a single scikit-learn `Pipeline` object (`models/final_model.joblib`), ensuring identical transformation logic during REST API inference.
 4. **Production FastAPI Service**: Exposes robust REST endpoints with strict Pydantic input validation, custom error handlers, and OpenAPI interactive documentation (`/docs`).
 5. **Multi-Stage Dockerization**: Packaged into a minimal `python:3.11-slim` container running under non-root security privileges (`appuser`), verified to yield $< 10^{-6}$ probability delta compared to local execution.
-6. **Comprehensive Automated Test Coverage**: 142 automated unit, pipeline, API, and container parity tests achieving 100% pass rate.
+6. **Comprehensive Automated Test Coverage**: 170 automated unit, pipeline, API, and container parity tests achieving 100% pass rate.
 
 ---
 
@@ -227,7 +227,7 @@ pip install -r requirements.txt
 ```bash
 pytest -q
 ```
-*Expected result: 142 passed cleanly.*
+*Expected result: 170 passed cleanly.*
 
 ---
 
@@ -275,20 +275,20 @@ Interactive Swagger documentation is available live at `http://localhost:8000/do
 
 ---
 
-### Input Schema (`PatientData`)
+### Input Schema (`PredictionInput`)
 
 | Feature Name | Type | Valid Range / Categories | Description |
 | :--- | :--- | :--- | :--- |
-| `age` | `integer` | $20 \le \text{age} \le 100$ | Patient age in years |
-| `sex` | `string` | `"Male"`, `"Female"` | Biological sex |
-| `cp` | `string` | `"typical angina"`, `"atypical angina"`, `"non-anginal pain"`, `"asymptomatic"` | Chest pain type |
-| `trestbps` | `number` | $80 \le \text{trestbps} \le 220$ | Resting blood pressure (mm Hg) |
-| `chol` | `number` | $0 \le \text{chol} \le 600$ | Serum cholesterol (mg/dl; $0$ imputed as missing) |
-| `fbs` | `boolean` | `true`, `false` | Fasting blood sugar > 120 mg/dl |
-| `restecg` | `string` | `"normal"`, `"ST-T wave abnormality"`, `"left ventricular hypertrophy"` | Resting ECG results |
-| `thalch` | `number` | $60 \le \text{thalch} \le 220$ | Maximum heart rate achieved |
-| `exang` | `boolean` | `true`, `false` | Exercise induced angina |
-| `oldpeak` | `number` | $-3.0 \le \text{oldpeak} \le 10.0$ | ST depression induced by exercise relative to rest |
+| `age` | `integer` / `number` | $1 \le \text{age} \le 120$ | Patient age in years |
+| `sex` | `string` / `integer` | `"Male"`, `"Female"`, `1`, `0` | Biological sex |
+| `cp` | `string` | `"asymptomatic"`, `"non-anginal"`, `"typical angina"`, `"atypical angina"` | Chest pain type |
+| `trestbps` | `number` | $0 \le \text{trestbps} \le 300$ | Resting blood pressure (mm Hg) |
+| `chol` | `number` | $0 \le \text{chol} \le 1500$ | Serum cholesterol (mg/dl; $0$ imputed as missing) |
+| `fbs` | `boolean` / `string` / `number` | `true`, `false`, `1`, `0` | Fasting blood sugar > 120 mg/dl |
+| `restecg` | `string` | `"normal"`, `"st-t abnormality"`, `"lv hypertrophy"` | Resting ECG results |
+| `thalch` | `number` | $1 \le \text{thalch} \le 250$ | Maximum heart rate achieved |
+| `exang` | `boolean` / `string` / `number` | `true`, `false`, `1`, `0` | Exercise induced angina |
+| `oldpeak` | `number` | $-10.0 \le \text{oldpeak} \le 15.0$ | ST depression induced by exercise relative to rest |
 
 ---
 
