@@ -4,40 +4,48 @@ Defines request and response data models for single and batch predictions,
 health checks, and root info endpoints.
 """
 
-from typing import Union, List, Optional
+from typing import Union, List, Optional, Literal
 from pydantic import BaseModel, Field
 
 
 class PredictionInput(BaseModel):
     """Schema for a single prediction request containing the 10 required raw features."""
 
-    age: Union[int, float] = Field(..., description="Age in years")
+    age: Union[int, float] = Field(
+        ..., ge=1, le=120, description="Age in years (1 to 120)"
+    )
     sex: Union[str, int] = Field(..., description="Sex ('Male', 'Female', 1, 0)")
-    cp: str = Field(
+    cp: Literal[
+        "typical angina", "atypical angina", "non-anginal", "asymptomatic"
+    ] = Field(
         ...,
         description="Chest pain type ('typical angina', 'atypical angina', 'non-anginal', 'asymptomatic')",
     )
     trestbps: Union[int, float] = Field(
-        ..., description="Resting blood pressure in mm Hg"
+        ..., ge=0, le=300, description="Resting blood pressure in mm Hg (0 to 300)"
     )
     chol: Union[int, float] = Field(
-        ..., description="Serum cholesterol in mg/dl (0 indicates unrecorded)"
+        ..., ge=0, le=1500, description="Serum cholesterol in mg/dl (0 indicates unrecorded, max 1500)"
     )
     fbs: Union[bool, int, float, str] = Field(
         ..., description="Fasting blood sugar > 120 mg/dl (True/False or 1/0)"
     )
-    restecg: str = Field(
+    restecg: Literal[
+        "normal",
+        "st-t abnormality",
+        "lv hypertrophy",
+    ] = Field(
         ...,
-        description="Resting ECG ('normal', 'ST-T wave abnormality', 'left ventricular hypertrophy')",
+        description="Resting ECG ('normal', 'st-t abnormality', 'lv hypertrophy')",
     )
     thalch: Union[int, float] = Field(
-        ..., description="Maximum heart rate achieved"
+        ..., ge=1, le=250, description="Maximum heart rate achieved (1 to 250)"
     )
     exang: Union[bool, int, float, str] = Field(
         ..., description="Exercise induced angina (True/False or 1/0)"
     )
     oldpeak: Union[int, float] = Field(
-        ..., description="ST depression induced by exercise relative to rest"
+        ..., ge=-10.0, le=15.0, description="ST depression induced by exercise relative to rest (-10.0 to 15.0)"
     )
 
     model_config = {

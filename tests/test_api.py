@@ -106,7 +106,7 @@ def test_valid_categorical_combinations(client, valid_single_payload):
     """5. Test valid payloads across different categorical feature combinations."""
     cp_values = ["typical angina", "atypical angina", "non-anginal", "asymptomatic"]
     sex_values = ["Male", "Female", 0, 1]
-    restecg_values = ["normal", "ST-T wave abnormality", "left ventricular hypertrophy"]
+    restecg_values = ["normal", "st-t abnormality", "lv hypertrophy"]
 
     for cp in cp_values:
         for sex in sex_values:
@@ -434,3 +434,62 @@ def test_robustness_excessively_long_strings(client, valid_single_payload):
     res = client.post("/predict", json=payload)
     assert res.status_code in [200, 422]
     assert "Traceback" not in str(res.json())
+
+
+# =====================================================================
+# Part M — Phase 17.2 Canonical Categorical & Validation Hardening Tests
+# =====================================================================
+
+@pytest.mark.parametrize("invalid_field, invalid_val", [
+    ("age", -5),
+    ("age", 0),
+    ("trestbps", -1),
+    ("chol", -1),
+    ("thalch", 0),
+    ("oldpeak", -100),
+    ("oldpeak", 100),
+    ("cp", "invalid_chest_pain"),
+    ("restecg", "invalid_rest_ecg"),
+    ("restecg", "ST-T wave abnormality"),
+    ("restecg", "left ventricular hypertrophy"),
+])
+def test_validation_hardening_rejected_invalid_values(client, valid_single_payload, invalid_field, invalid_val):
+    """Test that out-of-bounds numeric values, invalid categorical strings, and verbose restecg aliases return HTTP 422."""
+    payload = valid_single_payload.copy()
+    payload[invalid_field] = invalid_val
+
+    res = client.post("/predict", json=payload)
+    assert res.status_code == 422
+    assert "detail" in res.json()
+
+
+@pytest.mark.parametrize("valid_field, valid_val", [
+    ("age", 28),
+    ("age", 77),
+    ("trestbps", 80),
+    ("trestbps", 200),
+    ("chol", 0),
+    ("chol", 603),
+    ("thalch", 60),
+    ("thalch", 202),
+    ("oldpeak", -2.6),
+    ("oldpeak", 6.2),
+    ("restecg", "normal"),
+    ("restecg", "st-t abnormality"),
+    ("restecg", "lv hypertrophy"),
+    ("cp", "asymptomatic"),
+    ("cp", "non-anginal"),
+    ("cp", "typical angina"),
+    ("cp", "atypical angina"),
+])
+def test_validation_hardening_accepted_boundary_values(client, valid_single_payload, valid_field, valid_val):
+    """Test that valid boundary values and canonical categorical values remain accepted with HTTP 200."""
+    payload = valid_single_payload.copy()
+    payload[valid_field] = valid_val
+
+    res = client.post("/predict", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["predicted_class"] in [0, 1]
+    assert 0.0 <= data["predicted_probability"] <= 1.0
+

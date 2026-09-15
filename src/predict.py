@@ -133,12 +133,36 @@ def validate_prediction_input(
             if not isinstance(val, (int, float, np.number)):
                 # Try converting numeric strings
                 try:
-                    float(val)
+                    num_val = float(val)
                 except (ValueError, TypeError):
                     raise ValueError(
                         f"Invalid numeric value '{val}' for feature '{col}' at index {idx}. "
                         "Must be a valid integer or float."
                     )
+            else:
+                num_val = float(val)
+
+            # Enforce numerical range constraints
+            if col == "age" and not (1 <= num_val <= 120):
+                raise ValueError(
+                    f"Invalid value {num_val} for feature 'age' at index {idx}. Must be between 1 and 120."
+                )
+            elif col == "trestbps" and not (0 <= num_val <= 300):
+                raise ValueError(
+                    f"Invalid value {num_val} for feature 'trestbps' at index {idx}. Must be between 0 and 300."
+                )
+            elif col == "chol" and not (0 <= num_val <= 1500):
+                raise ValueError(
+                    f"Invalid value {num_val} for feature 'chol' at index {idx}. Must be between 0 and 1500."
+                )
+            elif col == "thalch" and not (1 <= num_val <= 250):
+                raise ValueError(
+                    f"Invalid value {num_val} for feature 'thalch' at index {idx}. Must be between 1 and 250."
+                )
+            elif col == "oldpeak" and not (-10.0 <= num_val <= 15.0):
+                raise ValueError(
+                    f"Invalid value {num_val} for feature 'oldpeak' at index {idx}. Must be between -10.0 and 15.0."
+                )
 
     # 3. Validate Boolean Features
     valid_bool_values = {True, False, 1, 0, 1.0, 0.0, "true", "false", "True", "False", "1", "0"}
@@ -154,6 +178,9 @@ def validate_prediction_input(
                 )
 
     # 4. Validate Categorical Features
+    ALLOWED_CP = {"typical angina", "atypical angina", "non-anginal", "asymptomatic"}
+    ALLOWED_RESTECG = {"normal", "st-t abnormality", "lv hypertrophy"}
+
     for col in CATEGORICAL_FEATURES:
         series = df[col]
         for idx, val in series.items():
@@ -163,6 +190,16 @@ def validate_prediction_input(
                 raise ValueError(
                     f"Invalid categorical value '{val}' for feature '{col}' at index {idx}. "
                     "Categorical features cannot be complex data structures."
+                )
+            if col == "cp" and val not in ALLOWED_CP:
+                raise ValueError(
+                    f"Invalid categorical value '{val}' for feature 'cp' at index {idx}. "
+                    f"Must be one of {ALLOWED_CP}."
+                )
+            if col == "restecg" and val not in ALLOWED_RESTECG:
+                raise ValueError(
+                    f"Invalid categorical value '{val}' for feature 'restecg' at index {idx}. "
+                    f"Must be one of {ALLOWED_RESTECG}."
                 )
 
     return df
