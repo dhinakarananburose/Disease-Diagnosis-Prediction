@@ -5,7 +5,7 @@
  */
 
 // 1. API BASE URL CONFIGURATION
-const API_BASE_URL = "http://localhost:8000";
+const API_BASE_URL = "";
 
 // DOM Element Registry
 const elements = {
