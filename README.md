@@ -3,11 +3,12 @@
 ![Python Version](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-blue.svg)
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-1.4+-orange.svg)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-green.svg)
+![Web UI](https://img.shields.io/badge/Web%20UI-Interactive-purple.svg)
 ![Docker](https://img.shields.io/badge/Docker-Supported-blue.svg)
 ![Tests](https://img.shields.io/badge/Tests-170%20Passed-brightgreen.svg)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
-Production-structured, end-to-end machine learning system for heart disease risk classification built on clinical data ($N=918$). The project features a leakage-safe preprocessing pipeline, comprehensive benchmarking across 5 classification algorithms, hyperparameter-tuned Support Vector Machine (`SVC`), automated model persistence, a reusable prediction module, a RESTful FastAPI microservice with Pydantic schema validation, and lightweight Docker containerization verified with 170 automated unit tests.
+Production-structured, end-to-end machine learning system for heart disease risk classification built on clinical data ($N=918$). The project features a leakage-safe preprocessing pipeline, comprehensive benchmarking across 5 classification algorithms, hyperparameter-tuned Support Vector Machine (`SVC`), automated model persistence, a reusable prediction module, a RESTful FastAPI microservice with Pydantic schema validation, an interactive browser web dashboard (`/ui`), and lightweight Docker containerization verified with 170 automated unit tests.
 
 > [!WARNING]
 > **Non-Clinical Disclaimer**: This application is a machine-learning research prototype developed to demonstrate software design and predictive modeling workflows. It is **not a clinically validated diagnostic system** and must not be used for medical diagnosis or clinical decision-making.
@@ -32,19 +33,16 @@ All evaluation metrics were computed on a held-out test dataset ($N=184$, strati
 
 ---
 
-## Visual Model Evaluation & Diagnostic Visualizations
+## Interactive Web Dashboard
 
-### 1. Model Discrimination & ROC Curves
-![ROC Curves Comparison](reports/figures/tuned_roc_curves.png)
-*Figure 1: Receiver Operating Characteristic (ROC) curve comparing tuned candidate models on the held-out test set ($N=184$). The tuned Linear SVM achieves an ROC-AUC score of 0.9295.*
+A lightweight browser interface for interacting with the persisted FastAPI inference service, accessible locally at `http://localhost:8000/ui`.
 
-### 2. Final Model Confusion Matrix
-![Confusion Matrix](reports/figures/tuned_confusion_matrices.png)
-*Figure 2: Confusion matrix heatmaps for tuned candidate models demonstrating classification performance across True Negatives ($67$), False Positives ($15$), False Negatives ($13$), and True Positives ($89$).*
-
-### 3. Feature Correlation Analysis
-![Correlation Heatmap](reports/figures/correlation_heatmap.png)
-*Figure 3: Pairwise correlation heatmap across clinical numerical features, showing absence of high multicollinearity ($|r| < 0.40$ among numerical predictors).*
+Key UI Capabilities:
+- **Single Risk Classification**: Interactive form for all 10 clinical input parameters with instant single prediction (`POST /predict`).
+- **Probability & Model Metadata**: Visual probability bar showing the model's predicted risk probability alongside model architecture details (`SVC, C=100`).
+- **Held-Out Test Set Metrics**: Live display of all 7 empirical test set metrics ($N=184$) and confusion matrix values.
+- **Batch Processing Workspace**: JSON array editor with sample data loader and tabular batch prediction display (`POST /predict/batch`).
+- **System Health Monitor**: Live REST API connection status badge pinging `GET /health`.
 
 ---
 
@@ -54,6 +52,7 @@ All evaluation metrics were computed on a held-out test dataset ($N=184$, strati
 - **Machine Learning**: `Scikit-Learn` (`SVC`, `LogisticRegression`, `RandomForestClassifier`, `KNeighborsClassifier`, `DecisionTreeClassifier`, `StandardScaler`, `OneHotEncoder`, `GridSearchCV`, `Pipeline`), `Joblib`
 - **Visualization**: `Matplotlib`, `Seaborn`
 - **Web API Microservice**: `FastAPI`, `Pydantic v2`, `Uvicorn`
+- **Interactive Web UI**: `HTML5`, `CSS3 (Glassmorphic)`, `Vanilla JavaScript (Fetch API)`
 - **Containerization & Deployment**: `Docker`, `Docker Compose`
 - **Software Quality & Testing**: `Pytest`, `HTTPX`
 
@@ -88,14 +87,31 @@ Inference Pipeline ──► src/predict.py (Reusable Single & Batch Prediction 
        ▼
 FastAPI REST Application ──► app/main.py (POST /predict, POST /predict/batch)
        │
-       ▼
-Docker Containerization ──► python:3.11-slim Container (Non-root appuser execution)
+       ├───────────────────────────────────────┐
+       ▼                                       ▼
+Interactive Web UI (http://localhost:8000/ui)  Docker Containerization (python:3.11-slim)
 ```
 
 ### Containerized Application Boundary
 
 ![System Architecture](reports/figures/system_architecture.png)
-*Figure 4: System Architecture flow detailing HTTP request routing, Pydantic schema validation, inference pipeline, preprocessor, and tuned SVM classifier inside the Docker container.*
+*Figure 1: System Architecture flow detailing HTTP request routing, Pydantic schema validation, inference pipeline, preprocessor, and tuned SVM classifier inside the Docker container.*
+
+---
+
+## Visual Model Evaluation & Diagnostic Visualizations
+
+### 1. Model Discrimination & ROC Curves
+![ROC Curves Comparison](reports/figures/tuned_roc_curves.png)
+*Figure 2: Receiver Operating Characteristic (ROC) curve comparing tuned candidate models on the held-out test set ($N=184$). The tuned Linear SVM achieves an ROC-AUC score of 0.9295.*
+
+### 2. Final Model Confusion Matrix
+![Confusion Matrix](reports/figures/tuned_confusion_matrices.png)
+*Figure 3: Confusion matrix heatmaps for tuned candidate models demonstrating classification performance across True Negatives ($67$), False Positives ($15$), False Negatives ($13$), and True Positives ($89$).*
+
+### 3. Feature Correlation Analysis
+![Correlation Heatmap](reports/figures/correlation_heatmap.png)
+*Figure 4: Pairwise correlation heatmap across clinical numerical features, showing absence of high multicollinearity ($|r| < 0.40$ among numerical predictors).*
 
 ---
 
@@ -105,8 +121,9 @@ Docker Containerization ──► python:3.11-slim Container (Non-root appuser e
 2. **Robust Data Quality Treatment**: Unrecorded zero-cholesterol entries (`chol == 0`, $N=172$) were converted to missing values in-memory and imputed via training set median. Negative `oldpeak` entries were preserved based on physiological validity.
 3. **Encapsulated Pipeline Persistence**: The fitted preprocessor and classifier are saved as a single scikit-learn `Pipeline` object (`models/final_model.joblib`), ensuring identical transformation logic during REST API inference.
 4. **Production FastAPI Service**: Exposes robust REST endpoints with strict Pydantic input validation, custom error handlers, and OpenAPI interactive documentation (`/docs`).
-5. **Multi-Stage Dockerization**: Packaged into a minimal `python:3.11-slim` container running under non-root security privileges (`appuser`), verified to yield $< 10^{-6}$ probability delta compared to local execution.
-6. **Comprehensive Automated Test Coverage**: 170 automated unit, pipeline, API, and container parity tests achieving 100% pass rate.
+5. **Interactive Browser Dashboard**: Provides a zero-dependency frontend (`/ui`) for single and batch predictions, metrics review, and API status monitoring.
+6. **Multi-Stage Dockerization**: Packaged into a minimal `python:3.11-slim` container running under non-root security privileges (`appuser`), verified to yield $< 10^{-6}$ probability delta compared to local execution.
+7. **Comprehensive Automated Test Coverage**: 170 automated unit, pipeline, API, and container parity tests achieving 100% pass rate.
 
 ---
 
