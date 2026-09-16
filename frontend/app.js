@@ -1,74 +1,79 @@
 /**
- * Disease Diagnosis Prediction — Client-Side Application Logic (Phase 21)
- * Consumes existing FastAPI Backend endpoints (GET /health, POST /predict, POST /predict/batch)
- * Does NOT modify backend logic, ML pipeline, or probability calculations.
+ * Disease Diagnosis Prediction — Client Application Architecture (Phase 22)
+ * Consumes existing FastAPI backend endpoints (GET /health, POST /predict, POST /predict/batch).
+ * Zero local ML probability calculations, zero third-party telemetry, zero credentials/storage.
  */
 
 // 1. API BASE URL CONFIGURATION
 const API_BASE_URL = "http://localhost:8000";
 
-// DOM Elements
+// DOM Element Registry
 const elements = {
-    // Status Indicator
-    statusDot: document.getElementById("statusDot"),
-    statusText: document.getElementById("statusText"),
-    statusSubtext: document.getElementById("statusSubtext"),
+    // Header Status Badge
+    statusPulseDot: document.getElementById("statusPulseDot"),
+    statusMainText: document.getElementById("statusMainText"),
+    statusSubText: document.getElementById("statusSubText"),
+    diagApiStatus: document.getElementById("diagApiStatus"),
+    diagModelLoaded: document.getElementById("diagModelLoaded"),
 
-    // Tabs
-    tabButtons: document.querySelectorAll(".tab-btn"),
-    tabPanes: document.querySelectorAll(".tab-pane"),
+    // Navigation Tabs
+    navTabs: document.querySelectorAll(".nav-tab"),
+    tabPanels: document.querySelectorAll(".tab-panel"),
 
-    // Single Prediction Form & Buttons
-    predictionForm: document.getElementById("predictionForm"),
+    // Single Prediction Form & Controls
+    singlePredictionForm: document.getElementById("singlePredictionForm"),
     btnPredict: document.getElementById("btnPredict"),
+    predictBtnText: document.getElementById("predictBtnText"),
+    predictBtnIcon: document.getElementById("predictBtnIcon"),
+    predictBtnSpinner: document.getElementById("predictBtnSpinner"),
     btnReset: document.getElementById("btnReset"),
 
-    // Result Card Views
-    resultPlaceholder: document.getElementById("resultPlaceholder"),
-    resultLoading: document.getElementById("resultLoading"),
-    resultError: document.getElementById("resultError"),
-    resultContent: document.getElementById("resultContent"),
-    btnRetry: document.getElementById("btnRetry"),
-    errorTitle: document.getElementById("errorTitle"),
-    errorMsg: document.getElementById("errorMsg"),
+    // Result Card State Containers
+    stateIdle: document.getElementById("stateIdle"),
+    stateLoading: document.getElementById("stateLoading"),
+    stateError: document.getElementById("stateError"),
+    stateSuccess: document.getElementById("stateSuccess"),
+    btnRetryRequest: document.getElementById("btnRetryRequest"),
+    errorHeaderTitle: document.getElementById("errorHeaderTitle"),
+    errorBodyMsg: document.getElementById("errorBodyMsg"),
 
-    // Result Card Content Elements
-    resModelName: document.getElementById("resModelName"),
-    predictionStatusBox: document.getElementById("predictionStatusBox"),
-    statusBoxIcon: document.getElementById("statusBoxIcon"),
-    resPredictedClassTitle: document.getElementById("resPredictedClassTitle"),
+    // Result Output Controls
+    resModelNameText: document.getElementById("resModelNameText"),
+    classResultCard: document.getElementById("classResultCard"),
+    classIconCircle: document.getElementById("classIconCircle"),
+    resPredictedClassName: document.getElementById("resPredictedClassName"),
     resPredictedClassCode: document.getElementById("resPredictedClassCode"),
-    resProbabilityValue: document.getElementById("resProbabilityValue"),
-    resGaugeBar: document.getElementById("resGaugeBar"),
-    summaryChips: document.getElementById("summaryChips"),
+    resProbValueText: document.getElementById("resProbValueText"),
+    resProbFillBar: document.getElementById("resProbFillBar"),
+    submittedChipsFlex: document.getElementById("submittedChipsFlex"),
 
-    // Batch Prediction Elements
-    batchJsonInput: document.getElementById("batchJsonInput"),
-    btnRunBatch: document.getElementById("btnRunBatch"),
-    btnLoadSampleBatch: document.getElementById("btnLoadSampleBatch"),
-    btnClearBatch: document.getElementById("btnClearBatch"),
-    batchResultsWrapper: document.getElementById("batchResultsWrapper"),
+    // Batch Prediction Controls
+    batchJsonArea: document.getElementById("batchJsonArea"),
+    btnExecuteBatch: document.getElementById("btnExecuteBatch"),
+    btnLoadBatchSample: document.getElementById("btnLoadBatchSample"),
+    btnClearBatchInput: document.getElementById("btnClearBatchInput"),
+    batchResultsBlock: document.getElementById("batchResultsBlock"),
     batchTableBody: document.getElementById("batchTableBody"),
 };
 
-// Application State
-let apiOnline = false;
+// Global App State
+let isApiOnline = false;
 
-// Initialize App
+// Initialization Entry Point
 document.addEventListener("DOMContentLoaded", () => {
-    initTabs();
-    initForm();
-    initBatch();
-    checkApiHealth();
+    initNavigationTabs();
+    initFormHandlers();
+    initBatchHandlers();
     
-    // Poll API Health status every 15 seconds
-    setInterval(checkApiHealth, 15000);
+    // Initial health check & periodic polling
+    checkHealth();
+    setInterval(checkHealth, 15000);
 });
 
 /* ==========================================================================
-   1. API HEALTH CHECK
+   1. SERVICE HEALTH CHECK & STATUS MONITORING
    ========================================================================== */
-async function checkApiHealth() {
+async function checkHealth() {
     try {
         const response = await fetch(`${API_BASE_URL}/health`, {
             method: "GET",
@@ -78,159 +83,175 @@ async function checkApiHealth() {
         if (response.ok) {
             const data = await response.json();
             if (data.status === "healthy" && data.model_loaded) {
-                setApiStatus(true, "API: Online", "Model Artifact Loaded");
+                updateHealthStatus(true, "API: Online", "Model Loaded (final_model.joblib)");
             } else {
-                setApiStatus(false, "API: Warning", "Model Not Loaded");
+                updateHealthStatus(false, "API: Warning", "Model Unloaded / Warning");
             }
         } else {
-            setApiStatus(false, "API: Offline", `HTTP Error ${response.status}`);
+            updateHealthStatus(false, "API: Offline", `HTTP Status ${response.status}`);
         }
     } catch (err) {
-        setApiStatus(false, "API: Unreachable", "Backend Server Offline");
+        updateHealthStatus(false, "API: Offline", "Backend Unreachable");
     }
 }
 
-function setApiStatus(isHealthy, text, subtext) {
-    apiOnline = isHealthy;
-    if (elements.statusDot) {
-        elements.statusDot.className = "status-dot " + (isHealthy ? "online" : "offline");
+function updateHealthStatus(online, mainText, subText) {
+    isApiOnline = online;
+
+    if (elements.statusPulseDot) {
+        elements.statusPulseDot.className = "status-pulse-dot " + (online ? "online" : "offline");
     }
-    if (elements.statusText) elements.statusText.textContent = text;
-    if (elements.statusSubtext) elements.statusSubtext.textContent = subtext;
+    if (elements.statusMainText) elements.statusMainText.textContent = mainText;
+    if (elements.statusSubText) elements.statusSubText.textContent = subText;
+
+    if (elements.diagApiStatus) elements.diagApiStatus.textContent = online ? "Online" : "Offline / Unreachable";
+    if (elements.diagModelLoaded) elements.diagModelLoaded.textContent = online ? "Loaded (final_model.joblib)" : "Unavailable";
 }
 
 /* ==========================================================================
-   2. TAB NAVIGATION
+   2. NAVIGATION TAB CONTROLLER
    ========================================================================== */
-function initTabs() {
-    elements.tabButtons.forEach(btn => {
-        btn.addEventListener("click", () => {
-            const targetTab = btn.getAttribute("data-tab");
+function initNavigationTabs() {
+    elements.navTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            const targetPanelId = tab.getAttribute("aria-controls");
 
-            elements.tabButtons.forEach(b => {
-                b.classList.remove("active");
-                b.setAttribute("aria-selected", "false");
+            elements.navTabs.forEach(t => {
+                t.classList.remove("active");
+                t.setAttribute("aria-selected", "false");
             });
-            elements.tabPanes.forEach(p => p.classList.add("hidden"));
+            elements.tabPanels.forEach(p => p.classList.add("hidden"));
 
-            btn.classList.add("active");
-            btn.setAttribute("aria-selected", "true");
-            const activePane = document.getElementById(targetTab);
-            if (activePane) activePane.classList.remove("hidden");
+            tab.classList.add("active");
+            tab.setAttribute("aria-selected", "true");
+            
+            const targetPanel = document.getElementById(targetPanelId);
+            if (targetPanel) targetPanel.classList.remove("hidden");
         });
     });
 }
 
 /* ==========================================================================
-   3. SINGLE PREDICTION FORM HANDLING & CLIENT-SIDE VALIDATION
+   3. SINGLE PREDICTION FORM CONTROLLER
    ========================================================================== */
-function initForm() {
-    if (elements.predictionForm) {
-        elements.predictionForm.addEventListener("submit", handleSinglePredictSubmit);
+function initFormHandlers() {
+    if (elements.singlePredictionForm) {
+        elements.singlePredictionForm.addEventListener("submit", handleFormSubmission);
     }
     if (elements.btnReset) {
-        elements.btnReset.addEventListener("click", handleReset);
+        elements.btnReset.addEventListener("click", resetForm);
     }
-    if (elements.btnRetry) {
-        elements.btnRetry.addEventListener("click", handleSinglePredictSubmit);
-    }
-}
-
-function clearFormErrors() {
-    const errorSpans = document.querySelectorAll(".error-msg");
-    errorSpans.forEach(span => span.textContent = "");
-    const groups = document.querySelectorAll(".input-group");
-    groups.forEach(group => group.classList.remove("has-error"));
-}
-
-function setFieldError(fieldId, message) {
-    const errSpan = document.getElementById(`err-${fieldId}`);
-    if (errSpan) errSpan.textContent = message;
-    const inputElem = document.getElementById(fieldId);
-    if (inputElem && inputElem.closest(".input-group")) {
-        inputElem.closest(".input-group").classList.add("has-error");
+    if (elements.btnRetryRequest) {
+        elements.btnRetryRequest.addEventListener("click", handleFormSubmission);
     }
 }
 
-function getFormData() {
-    const age = parseFloat(document.getElementById("age").value);
-    const sex = document.getElementById("sex").value;
-    const cp = document.getElementById("cp").value;
-    const trestbps = parseFloat(document.getElementById("trestbps").value);
-    const chol = parseFloat(document.getElementById("chol").value);
+function collectFormData() {
+    const ageVal = parseFloat(document.getElementById("age").value);
+    const sexVal = document.getElementById("sex").value;
+    const cpVal = document.getElementById("cp").value;
+    const trestbpsVal = parseFloat(document.getElementById("trestbps").value);
+    const cholVal = parseFloat(document.getElementById("chol").value);
     const fbsStr = document.getElementById("fbs").value;
-    const fbs = (fbsStr === "true" || fbsStr === "True" || fbsStr === "1");
-    const restecg = document.getElementById("restecg").value;
-    const thalch = parseFloat(document.getElementById("thalch").value);
+    const fbsVal = (fbsStr === "true" || fbsStr === "True" || fbsStr === "1");
+    const restecgVal = document.getElementById("restecg").value;
+    const thalchVal = parseFloat(document.getElementById("thalch").value);
     const exangStr = document.getElementById("exang").value;
-    const exang = (exangStr === "true" || exangStr === "True" || exangStr === "1");
-    const oldpeak = parseFloat(document.getElementById("oldpeak").value);
+    const exangVal = (exangStr === "true" || exangStr === "True" || exangStr === "1");
+    const oldpeakVal = parseFloat(document.getElementById("oldpeak").value);
 
-    return { age, sex, cp, trestbps, chol, fbs, restecg, thalch, exang, oldpeak };
+    return {
+        age: ageVal,
+        sex: sexVal,
+        cp: cpVal,
+        trestbps: trestbpsVal,
+        chol: cholVal,
+        fbs: fbsVal,
+        restecg: restecgVal,
+        thalch: thalchVal,
+        exang: exangVal,
+        oldpeak: oldpeakVal
+    };
 }
 
-function validateFormData(payload) {
-    clearFormErrors();
-    let isValid = true;
+function clearFieldErrors() {
+    document.querySelectorAll(".field-err").forEach(el => el.textContent = "");
+    document.querySelectorAll(".input-control").forEach(el => el.classList.remove("has-error"));
+}
 
-    // age: 1 <= age <= 120
+function setFieldError(fieldId, errorMsg) {
+    const errSpan = document.getElementById(`err-${fieldId}`);
+    if (errSpan) errSpan.textContent = errorMsg;
+    const controlGroup = document.getElementById(`control-${fieldId}`);
+    if (controlGroup) controlGroup.classList.add("has-error");
+}
+
+function validateForm(payload) {
+    clearFieldErrors();
+    let valid = true;
+
+    // age: 1..120
     if (isNaN(payload.age) || payload.age < 1 || payload.age > 120) {
-        setFieldError("age", "Age must be a number between 1 and 120.");
-        isValid = false;
+        setFieldError("age", "Age must be between 1 and 120.");
+        valid = false;
     }
 
-    // trestbps: 0 <= trestbps <= 300
+    // trestbps: 0..300
     if (isNaN(payload.trestbps) || payload.trestbps < 0 || payload.trestbps > 300) {
         setFieldError("trestbps", "Resting BP must be between 0 and 300 mm Hg.");
-        isValid = false;
+        valid = false;
     }
 
-    // chol: 0 <= chol <= 1500 (chol = 0 is allowed and treated as missing in preprocessing)
+    // chol: 0..1500 (0 allowed and treated as missing by backend)
     if (isNaN(payload.chol) || payload.chol < 0 || payload.chol > 1500) {
         setFieldError("chol", "Cholesterol must be between 0 and 1500 mg/dl.");
-        isValid = false;
+        valid = false;
     }
 
-    // thalch: 1 <= thalch <= 250
+    // thalch: 1..250
     if (isNaN(payload.thalch) || payload.thalch < 1 || payload.thalch > 250) {
         setFieldError("thalch", "Max heart rate must be between 1 and 250 bpm.");
-        isValid = false;
+        valid = false;
     }
 
-    // oldpeak: -10.0 <= oldpeak <= 15.0
+    // oldpeak: -10.0..15.0
     if (isNaN(payload.oldpeak) || payload.oldpeak < -10.0 || payload.oldpeak > 15.0) {
         setFieldError("oldpeak", "ST depression must be between -10.0 and 15.0 mm.");
-        isValid = false;
+        valid = false;
     }
 
     // cp canonical values
-    const validCp = ["typical angina", "atypical angina", "non-anginal", "asymptomatic"];
-    if (!validCp.includes(payload.cp)) {
+    const allowedCp = ["typical angina", "atypical angina", "non-anginal", "asymptomatic"];
+    if (!allowedCp.includes(payload.cp)) {
         setFieldError("cp", "Invalid chest pain type selected.");
-        isValid = false;
+        valid = false;
     }
 
     // restecg canonical values
-    const validRestEcg = ["normal", "st-t abnormality", "lv hypertrophy"];
-    if (!validRestEcg.includes(payload.restecg)) {
+    const allowedRestEcg = ["normal", "st-t abnormality", "lv hypertrophy"];
+    if (!allowedRestEcg.includes(payload.restecg)) {
         setFieldError("restecg", "Invalid resting ECG value selected.");
-        isValid = false;
+        valid = false;
     }
 
-    return isValid;
+    return valid;
 }
 
-async function handleSinglePredictSubmit(e) {
+async function handleFormSubmission(e) {
     if (e && e.preventDefault) e.preventDefault();
 
-    const payload = getFormData();
-    if (!validateFormData(payload)) {
+    const formData = collectFormData();
+    if (!validateForm(formData)) {
         return;
     }
 
-    // Set UI to loading state
+    // Trigger Predict API Request
+    await predict(formData);
+}
+
+async function predict(formData) {
+    setButtonLoading(true);
     showResultState("loading");
-    setPredictButtonState(false, "Generating prediction...");
 
     try {
         const response = await fetch(`${API_BASE_URL}/predict`, {
@@ -239,13 +260,13 @@ async function handleSinglePredictSubmit(e) {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(formData)
         });
 
         if (response.ok) {
-            const resultData = await response.json();
-            renderPredictionResult(resultData, payload);
-            showResultState("content");
+            const result = await response.json();
+            displayPrediction(result, formData);
+            showResultState("success");
         } else {
             let errorDetail = `HTTP Error ${response.status}`;
             try {
@@ -254,111 +275,120 @@ async function handleSinglePredictSubmit(e) {
                     errorDetail = typeof errJson.detail === "string" ? errJson.detail : JSON.stringify(errJson.detail);
                 }
             } catch (_) {}
-
-            displayError("Input Validation / API Error", errorDetail);
+            displayError("Validation / API Error", errorDetail);
         }
     } catch (err) {
-        displayError("API Connection Unavailable", `Failed to connect to backend server at ${API_BASE_URL}. Ensure the FastAPI server is running.`);
+        displayError("API Connection Offline", `Could not connect to FastAPI server at ${API_BASE_URL}. Please ensure the server is active.`);
     } finally {
-        setPredictButtonState(true);
+        setButtonLoading(false);
     }
 }
 
-function setPredictButtonState(enabled, label = "PREDICT RISK") {
+function setButtonLoading(isLoading) {
     if (!elements.btnPredict) return;
-    elements.btnPredict.disabled = !enabled;
-    const labelSpan = elements.btnPredict.querySelector(".btn-label");
-    if (labelSpan) labelSpan.textContent = label;
+    elements.btnPredict.disabled = isLoading;
+    
+    if (elements.predictBtnText) {
+        elements.predictBtnText.textContent = isLoading ? "Analyzing..." : "Run Prediction";
+    }
+    if (elements.predictBtnIcon) {
+        elements.predictBtnIcon.classList.toggle("hidden", isLoading);
+    }
+    if (elements.predictBtnSpinner) {
+        elements.predictBtnSpinner.classList.toggle("hidden", !isLoading);
+    }
 }
 
-function showResultState(state) {
-    elements.resultPlaceholder.classList.add("hidden");
-    elements.resultLoading.classList.add("hidden");
-    elements.resultError.classList.add("hidden");
-    elements.resultContent.classList.add("hidden");
+function showResultState(stateName) {
+    elements.stateIdle.classList.add("hidden");
+    elements.stateLoading.classList.add("hidden");
+    elements.stateError.classList.add("hidden");
+    elements.stateSuccess.classList.add("hidden");
 
-    if (state === "placeholder") elements.resultPlaceholder.classList.remove("hidden");
-    if (state === "loading") elements.resultLoading.classList.remove("hidden");
-    if (state === "error") elements.resultError.classList.remove("hidden");
-    if (state === "content") elements.resultContent.classList.remove("hidden");
+    if (stateName === "idle") elements.stateIdle.classList.remove("hidden");
+    if (stateName === "loading") elements.stateLoading.classList.remove("hidden");
+    if (stateName === "error") elements.stateError.classList.remove("hidden");
+    if (stateName === "success") elements.stateSuccess.classList.remove("hidden");
 }
 
-function displayError(title, message) {
-    if (elements.errorTitle) elements.errorTitle.textContent = title;
-    if (elements.errorMsg) elements.errorMsg.textContent = message;
+function displayError(titleText, msgText) {
+    if (elements.errorHeaderTitle) elements.errorHeaderTitle.textContent = titleText;
+    if (elements.errorBodyMsg) elements.errorBodyMsg.textContent = msgText;
     showResultState("error");
 }
 
 /* ==========================================================================
-   4. RENDER PREDICTION RESULT
+   4. RENDER PREDICTION OUTPUT
    ========================================================================== */
-function renderPredictionResult(result, inputPayload) {
-    // 1. Model Name
-    if (elements.resModelName) {
-        elements.resModelName.textContent = result.model_name || "Tuned Support Vector Machine";
+function displayPrediction(result, inputPayload) {
+    // Model Name
+    if (elements.resModelNameText) {
+        elements.resModelNameText.textContent = result.model_name || "Tuned Support Vector Machine";
     }
 
-    // 2. Predicted Class (0 or 1)
+    // Predicted Class (0 or 1) & Probability
     const predClass = Number(result.predicted_class);
     const predProb = Number(result.predicted_probability);
 
     // Format probability percentage safely
-    const probPctStr = (isNaN(predProb) ? 0 : (predProb * 100)).toFixed(1) + "%";
-    
-    if (elements.resProbabilityValue) {
-        elements.resProbabilityValue.textContent = probPctStr;
+    const probPct = isNaN(predProb) ? 0 : (predProb * 100);
+    const probFormattedStr = probPct.toFixed(1) + "%";
+
+    if (elements.resProbValueText) {
+        elements.resProbValueText.textContent = probFormattedStr;
     }
-    if (elements.resGaugeBar) {
-        elements.resGaugeBar.style.width = isNaN(predProb) ? "0%" : `${Math.min(100, Math.max(0, predProb * 100))}%`;
+
+    if (elements.resProbFillBar) {
+        elements.resProbFillBar.style.width = `${Math.min(100, Math.max(0, probPct))}%`;
         if (predProb >= 0.5) {
-            elements.resGaugeBar.classList.add("high-risk");
+            elements.resProbFillBar.classList.add("high-risk");
         } else {
-            elements.resGaugeBar.classList.remove("high-risk");
+            elements.resProbFillBar.classList.remove("high-risk");
         }
     }
 
-    // Classification Result Status Box
-    if (elements.predictionStatusBox) {
+    // Classification Box (Class 0 vs Class 1)
+    if (elements.classResultCard) {
         if (predClass === 1) {
-            elements.predictionStatusBox.className = "prediction-status-box disease-present";
-            elements.statusBoxIcon.innerHTML = `
+            elements.classResultCard.className = "class-result-card disease-present";
+            elements.classIconCircle.innerHTML = `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>`;
-            elements.resPredictedClassTitle.textContent = "Heart Disease Predicted";
-            elements.resPredictedClassCode.textContent = "Predicted Class Label: 1 (Positive Risk)";
+            elements.resPredictedClassName.textContent = "Heart Disease Predicted";
+            elements.resPredictedClassCode.textContent = "Predicted Class Label: 1 (Positive Class)";
         } else {
-            elements.predictionStatusBox.className = "prediction-status-box no-disease";
-            elements.statusBoxIcon.innerHTML = `
+            elements.classResultCard.className = "class-result-card no-disease";
+            elements.classIconCircle.innerHTML = `
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>`;
-            elements.resPredictedClassTitle.textContent = "No Heart Disease Predicted";
-            elements.resPredictedClassCode.textContent = "Predicted Class Label: 0 (Negative Risk)";
+            elements.resPredictedClassName.textContent = "No Heart Disease Predicted";
+            elements.resPredictedClassCode.textContent = "Predicted Class Label: 0 (Negative Class)";
         }
     }
 
-    // Render Observation Chips
-    if (elements.summaryChips) {
-        elements.summaryChips.innerHTML = `
-            <span class="chip">Age: ${inputPayload.age} y/o</span>
-            <span class="chip">Sex: ${inputPayload.sex}</span>
-            <span class="chip">CP: ${inputPayload.cp}</span>
-            <span class="chip">BP: ${inputPayload.trestbps} mm Hg</span>
-            <span class="chip">Chol: ${inputPayload.chol === 0 ? "0 (Unrecorded)" : inputPayload.chol + " mg/dl"}</span>
-            <span class="chip">FBS > 120: ${inputPayload.fbs ? "True" : "False"}</span>
-            <span class="chip">ECG: ${inputPayload.restecg}</span>
-            <span class="chip">Max HR: ${inputPayload.thalch} bpm</span>
-            <span class="chip">ExAngina: ${inputPayload.exang ? "True" : "False"}</span>
-            <span class="chip">Oldpeak: ${inputPayload.oldpeak}</span>
+    // Render Submitted Vector Chips
+    if (elements.submittedChipsFlex) {
+        elements.submittedChipsFlex.innerHTML = `
+            <span class="summary-chip">Age: ${inputPayload.age} y/o</span>
+            <span class="summary-chip">Sex: ${inputPayload.sex}</span>
+            <span class="summary-chip">CP: ${inputPayload.cp}</span>
+            <span class="summary-chip">BP: ${inputPayload.trestbps} mm Hg</span>
+            <span class="summary-chip">Chol: ${inputPayload.chol === 0 ? "0 (Unrecorded)" : inputPayload.chol + " mg/dl"}</span>
+            <span class="summary-chip">FBS > 120: ${inputPayload.fbs ? "True" : "False"}</span>
+            <span class="summary-chip">ECG: ${inputPayload.restecg}</span>
+            <span class="summary-chip">Max HR: ${inputPayload.thalch} bpm</span>
+            <span class="summary-chip">ExAngina: ${inputPayload.exang ? "True" : "False"}</span>
+            <span class="summary-chip">Oldpeak: ${inputPayload.oldpeak}</span>
         `;
     }
 }
 
-function handleReset() {
-    clearFormErrors();
-    
-    // Reset Form fields to defaults
+function resetForm() {
+    clearFieldErrors();
+
+    // Reset controls to standard demo baseline values
     document.getElementById("age").value = 55;
     document.getElementById("sex").value = "Male";
     document.getElementById("cp").value = "asymptomatic";
@@ -370,29 +400,29 @@ function handleReset() {
     document.getElementById("exang").value = "false";
     document.getElementById("oldpeak").value = 1.2;
 
-    showResultState("placeholder");
-    setPredictButtonState(true);
+    showResultState("idle");
+    setButtonLoading(false);
 }
 
 /* ==========================================================================
-   5. BATCH PREDICTION INTERFACE
+   5. BATCH PREDICTION CONTROLLER
    ========================================================================== */
-function initBatch() {
-    if (elements.btnRunBatch) {
-        elements.btnRunBatch.addEventListener("click", handleBatchPredict);
+function initBatchHandlers() {
+    if (elements.btnExecuteBatch) {
+        elements.btnExecuteBatch.addEventListener("click", predictBatch);
     }
-    if (elements.btnLoadSampleBatch) {
-        elements.btnLoadSampleBatch.addEventListener("click", loadSampleBatchJson);
+    if (elements.btnLoadBatchSample) {
+        elements.btnLoadBatchSample.addEventListener("click", loadBatchDemoSample);
     }
-    if (elements.btnClearBatch) {
-        elements.btnClearBatch.addEventListener("click", () => {
-            elements.batchJsonInput.value = "";
-            elements.batchResultsWrapper.classList.add("hidden");
+    if (elements.btnClearBatchInput) {
+        elements.btnClearBatchInput.addEventListener("click", () => {
+            elements.batchJsonArea.value = "";
+            elements.batchResultsBlock.classList.add("hidden");
         });
     }
 }
 
-const SAMPLE_BATCH_DATA = {
+const DEMO_BATCH_JSON = {
     "records": [
         {
             "age": 55, "sex": "Male", "cp": "asymptomatic", "trestbps": 140, "chol": 250,
@@ -409,34 +439,35 @@ const SAMPLE_BATCH_DATA = {
     ]
 };
 
-function loadSampleBatchJson() {
-    if (elements.batchJsonInput) {
-        elements.batchJsonInput.value = JSON.stringify(SAMPLE_BATCH_DATA, null, 2);
+function loadBatchDemoSample() {
+    if (elements.batchJsonArea) {
+        elements.batchJsonArea.value = JSON.stringify(DEMO_BATCH_JSON, null, 2);
     }
 }
 
-async function handleBatchPredict() {
-    const jsonText = elements.batchJsonInput.value.trim();
-    if (!jsonText) {
+async function predictBatch() {
+    const rawJson = elements.batchJsonArea.value.trim();
+    if (!rawJson) {
         alert("Please enter or load a valid batch JSON payload.");
         return;
     }
 
-    let parsedPayload;
+    let parsedJson;
     try {
-        parsedPayload = JSON.parse(jsonText);
+        parsedJson = JSON.parse(rawJson);
     } catch (e) {
-        alert("Invalid JSON format. Please verify JSON syntax.");
+        alert("Syntax Error: Invalid JSON formatting.");
         return;
     }
 
-    if (!parsedPayload.records || !Array.isArray(parsedPayload.records) || parsedPayload.records.length === 0) {
-        alert("Batch JSON must contain a non-empty 'records' array.");
+    if (!parsedJson.records || !Array.isArray(parsedJson.records) || parsedJson.records.length === 0) {
+        alert("Payload must contain a non-empty 'records' array.");
         return;
     }
 
-    elements.btnRunBatch.disabled = true;
-    elements.btnRunBatch.querySelector(".btn-label").textContent = "PROCESSING BATCH...";
+    elements.btnExecuteBatch.disabled = true;
+    const btnSpan = elements.btnExecuteBatch.querySelector("span");
+    if (btnSpan) btnSpan.textContent = "Processing Batch...";
 
     try {
         const response = await fetch(`${API_BASE_URL}/predict/batch`, {
@@ -445,22 +476,22 @@ async function handleBatchPredict() {
                 "Content-Type": "application/json",
                 "Accept": "application/json"
             },
-            body: JSON.stringify(parsedPayload)
+            body: JSON.stringify(parsedJson)
         });
 
         if (response.ok) {
             const data = await response.json();
-            renderBatchTable(data.predictions, parsedPayload.records);
-            elements.batchResultsWrapper.classList.remove("hidden");
+            renderBatchTable(data.predictions, parsedJson.records);
+            elements.batchResultsBlock.classList.remove("hidden");
         } else {
-            const errJson = await response.json().catch(() => ({}));
-            alert(`Batch Prediction Error (${response.status}): ` + (errJson.detail || "Server validation error."));
+            const errBody = await response.json().catch(() => ({}));
+            alert(`Batch Prediction Error (${response.status}): ` + (errBody.detail || "Validation Error"));
         }
     } catch (err) {
-        alert("Failed to connect to API backend for batch prediction.");
+        alert("Failed to connect to API backend for batch inference.");
     } finally {
-        elements.btnRunBatch.disabled = false;
-        elements.btnRunBatch.querySelector(".btn-label").textContent = "RUN BATCH INFERENCE";
+        elements.btnExecuteBatch.disabled = false;
+        if (btnSpan) btnSpan.textContent = "Execute Batch Inference";
     }
 }
 
@@ -468,24 +499,24 @@ function renderBatchTable(predictions, records) {
     if (!elements.batchTableBody) return;
     elements.batchTableBody.innerHTML = "";
 
-    predictions.forEach((pred, idx) => {
-        const rec = records[idx] || {};
+    predictions.forEach((pred, i) => {
+        const rec = records[i] || {};
         const tr = document.createElement("tr");
 
         const predClass = Number(pred.predicted_class);
         const predProb = Number(pred.predicted_probability);
-        const probPctStr = (isNaN(predProb) ? 0 : (predProb * 100)).toFixed(1) + "%";
+        const probStr = (isNaN(predProb) ? 0 : (predProb * 100)).toFixed(1) + "%";
 
-        const badgeClass = predClass === 1 ? "danger-text" : "success-text";
-        const classLabel = predClass === 1 ? "1 (Heart Disease)" : "0 (No Disease)";
+        const textClass = predClass === 1 ? "status-rose-text" : "status-green-text";
+        const labelText = predClass === 1 ? "1 (Heart Disease)" : "0 (No Disease)";
 
         tr.innerHTML = `
-            <td>#${idx + 1}</td>
-            <td>${rec.age || "-"} / ${rec.sex || "-"}</td>
+            <td>#${i + 1}</td>
+            <td>${rec.age || "-"} y/o, ${rec.sex || "-"}</td>
             <td>${rec.cp || "-"}</td>
             <td>${rec.trestbps || "-"} / ${rec.chol !== undefined ? rec.chol : "-"}</td>
-            <td class="${badgeClass}" style="font-weight: 600;">${classLabel}</td>
-            <td style="font-weight: 600;">${probPctStr}</td>
+            <td class="${textClass}" style="font-weight: 600;">${labelText}</td>
+            <td style="font-weight: 600;">${probStr}</td>
             <td style="font-size: 0.78rem; color: #94a3b8;">${pred.model_name || "SVM"}</td>
         `;
         elements.batchTableBody.appendChild(tr);
