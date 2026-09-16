@@ -5,9 +5,11 @@ Uses src.predict and persisted artifact models/final_model.joblib.
 """
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Dict, Any, List
 import pandas as pd
 from fastapi import FastAPI, Request, status
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 
 from app.schemas import (
@@ -53,6 +55,12 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+# Mount frontend static directory if present
+frontend_path = Path(__file__).resolve().parent.parent / "frontend"
+if frontend_path.exists():
+    app.mount("/ui", StaticFiles(directory=str(frontend_path), html=True), name="ui")
+
 
 
 @app.exception_handler(ValueError)

@@ -139,6 +139,10 @@ If you wish to run exploratory data analysis notebooks or retrain the models loc
 
 ```
 Disease-Diagnosis-Prediction/
+├── frontend/                   # Interactive Web Frontend (Additive UI Layer)
+│   ├── index.html              # Modern dashboard layout & form controls
+│   ├── styles.css              # Glassmorphic CSS design system
+│   └── app.js                  # API integration & DOM state manager
 ├── app/                        # FastAPI Web Microservice
 │   ├── __init__.py
 │   ├── main.py                 # FastAPI application routes & startup logic
@@ -228,6 +232,19 @@ pip install -r requirements.txt
 pytest -q
 ```
 *Expected result: 170 passed cleanly.*
+
+### 4. Launch FastAPI Server & Interactive Web UI
+Start the FastAPI Uvicorn server locally:
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+Access the application in your web browser:
+- **Interactive Web UI**: [http://localhost:8000/ui](http://localhost:8000/ui) (or open `frontend/index.html` directly)
+- **Interactive OpenAPI Documentation**: [http://localhost:8000/docs](http://localhost:8000/docs)
+- **Health Check Status**: [http://localhost:8000/health](http://localhost:8000/health)
+
+**Architecture Flow**: `Browser UI (frontend/)` ──► `FastAPI REST Microservice (app/main.py)` ──► `Inference Engine (src/predict.py)` ──► `Fitted Preprocessor + Tuned SVM Pipeline (models/final_model.joblib)`
 
 ---
 
