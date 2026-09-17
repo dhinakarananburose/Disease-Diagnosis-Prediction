@@ -4,64 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Clinical AI Prediction Dashboard | Disease Diagnosis Machine Learning</title>
-    <meta name="description" content="Clinical machine learning prediction dashboard demonstrating end-to-end classification using a tuned Support Vector Machine model and FastAPI microservice.">
+    <meta name="description" content="Portfolio-grade Clinical AI Command Center demonstrating end-to-end machine learning classification using a tuned Support Vector Machine and FastAPI microservice.">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    <!-- AMBIENT BACKGROUND GLOW -->
-    <div class="bg-glow bg-glow-primary"></div>
-    <div class="bg-glow bg-glow-secondary"></div>
+<body class="dark-theme">
+    <!-- AMBIENT BACKGROUND DECORATION -->
+    <div class="bg-glow bg-glow-primary" aria-hidden="true"></div>
+    <div class="bg-glow bg-glow-secondary" aria-hidden="true"></div>
 
     <div class="app-layout">
-        <!-- HEADER -->
+        <!-- APPLICATION HEADER -->
         <header class="main-header">
             <div class="header-container">
                 <div class="header-brand">
-                    <div class="brand-logo">
+                    <div class="brand-logo" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
                         </svg>
                     </div>
                     <div class="brand-titles">
                         <span class="brand-name">Disease Diagnosis Prediction</span>
-                        <span class="brand-tagline">Clinical ML Prediction Platform</span>
+                        <span class="brand-tagline">Clinical AI Command Center & ML Platform</span>
                     </div>
                 </div>
 
-                <div class="header-status-badge" id="headerStatusBadge">
-                    <span class="status-pulse-dot" id="statusPulseDot"></span>
-                    <div class="status-text-group">
-                        <span class="status-main" id="statusMainText">API: Checking...</span>
-                        <span class="status-sub" id="statusSubText">Model: Verifying...</span>
+                <div class="header-meta-group">
+                    <div class="header-status-badge" id="headerStatusBadge" role="status" aria-live="polite">
+                        <span class="status-pulse-dot" id="statusPulseDot" aria-hidden="true"></span>
+                        <div class="status-text-group">
+                            <span class="status-main" id="statusMainText">API: Checking...</span>
+                            <span class="status-sub" id="statusSubText">Model: Verifying...</span>
+                        </div>
                     </div>
+                    <span class="version-badge">v1.0.0</span>
                 </div>
             </div>
         </header>
 
-        <!-- HERO SECTION -->
+        <!-- HERO / OVERVIEW SECTION -->
         <section class="hero-section">
             <div class="hero-content">
                 <div class="hero-badge">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    <span>Research & Educational Demonstration</span>
+                    <span>Engineering Research Prototype & Portfolio Demonstration</span>
                 </div>
-                <h1 class="hero-title">Clinical Data Classification & Risk Prediction</h1>
+                <h1 class="hero-title">Clinical Data Classification & Risk Prediction Platform</h1>
                 <p class="hero-description">
-                    An end-to-end machine learning demonstration utilizing clinical features ($N=918$), a leakage-isolated preprocessing pipeline, a persisted tuned Support Vector Machine model (`SVC`), and a FastAPI REST inference service.
+                    An end-to-end supervised machine learning system utilizing clinical observation features ($N=918$), a leakage-isolated preprocessing pipeline, a persisted tuned Support Vector Machine model (`SVC`), and a high-performance FastAPI REST inference service.
                 </p>
-                <div class="disclaimer-callout">
+                
+                <div class="hero-telemetry-strip">
+                    <div class="telemetry-pill">
+                        <span class="pill-label">Model:</span>
+                        <span class="pill-value">Tuned SVM (`SVC`)</span>
+                    </div>
+                    <div class="telemetry-pill">
+                        <span class="pill-label">Test Accuracy:</span>
+                        <span class="pill-value accent-teal">84.78%</span>
+                    </div>
+                    <div class="telemetry-pill">
+                        <span class="pill-label">Test ROC-AUC:</span>
+                        <span class="pill-value accent-indigo">0.9295</span>
+                    </div>
+                    <div class="telemetry-pill">
+                        <span class="pill-label">API Service:</span>
+                        <span class="pill-value">FastAPI REST (`/predict`)</span>
+                    </div>
+                </div>
+
+                <div class="disclaimer-callout" role="note">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                    <span><strong>Non-Clinical Disclaimer:</strong> This interface is a research and educational demonstration and is not a medical diagnostic tool or clinical decision-making system.</span>
+                    <span><strong>Non-Clinical Disclaimer:</strong> This interface is a software engineering research prototype and portfolio demonstration. It is not a clinically validated diagnostic tool or medical decision-making system. Output represents statistical model classification probability.</span>
                 </div>
             </div>
         </section>
 
         <!-- NAVIGATION TABS -->
         <nav class="nav-bar" role="tablist" aria-label="Dashboard sections">
+            <button class="nav-tab" data-tab="tab-overview" role="tab" aria-selected="false" aria-controls="tab-overview-panel" id="tab-overview-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                Overview
+            </button>
             <button class="nav-tab active" data-tab="tab-single" role="tab" aria-selected="true" aria-controls="tab-single-panel" id="tab-single-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                 Single Prediction
@@ -72,16 +99,77 @@
             </button>
             <button class="nav-tab" data-tab="tab-performance" role="tab" aria-selected="false" aria-controls="tab-performance-panel" id="tab-performance-btn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-                Model Metrics & Specs
+                Model Performance
             </button>
-            <button class="nav-tab" data-tab="tab-pipeline" role="tab" aria-selected="false" aria-controls="tab-pipeline-panel" id="tab-pipeline-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                System Architecture
+            <button class="nav-tab" data-tab="tab-api" role="tab" aria-selected="false" aria-controls="tab-api-panel" id="tab-api-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                API & Docs
             </button>
         </nav>
 
         <!-- TAB CONTENT PANELS -->
         <main class="main-content">
+
+            <!-- 0. OVERVIEW TAB PANEL -->
+            <div id="tab-overview-panel" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-overview-btn">
+                <div class="overview-workspace">
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h2>Clinical AI System Architecture & Architecture Overview</h2>
+                            <p class="panel-subtitle">Comprehensive breakdown of data modeling, model selection, and API deployment.</p>
+                        </div>
+
+                        <div class="overview-grid">
+                            <div class="overview-card">
+                                <div class="overview-icon teal">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                                </div>
+                                <h3>End-to-End ML Pipeline</h3>
+                                <p>Trained on $N=918$ observations across 5 clinical datasets (Cleveland, Hungarian, Switzerland, Long Beach, VA). Features are processed using median imputation for zero values (`chol=0`), Standard Scaling for continuous variables, and One-Hot Encoding for categoricals.</p>
+                            </div>
+
+                            <div class="overview-card">
+                                <div class="overview-icon indigo">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                </div>
+                                <h3>Strict Leakage Isolation</h3>
+                                <p>5-Fold Stratified Cross-Validation was performed exclusively on the training split ($N=734$). Imputation and scaling parameters were fitted strictly on training folds to eliminate data leakage before final model persistence.</p>
+                            </div>
+
+                            <div class="overview-card">
+                                <div class="overview-icon green">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                </div>
+                                <h3>FastAPI Inference Service</h3>
+                                <p>Exposes zero-latency REST endpoints for `/health`, `/predict`, and `/predict/batch` with strict Pydantic v2 schema validation. Deployed via Docker with Uvicorn worker process.</p>
+                            </div>
+                        </div>
+
+                        <!-- SYSTEM DIAGNOSTICS BANNER -->
+                        <div class="service-status-summary-card">
+                            <h3>Real-Time Service Telemetry</h3>
+                            <div class="diag-grid">
+                                <div class="diag-item">
+                                    <span class="diag-label">API Health:</span>
+                                    <span class="diag-value" id="diagApiStatus">Online</span>
+                                </div>
+                                <div class="diag-item">
+                                    <span class="diag-label">Model Pipeline:</span>
+                                    <span class="diag-value" id="diagModelLoaded">Loaded (`final_model.joblib`)</span>
+                                </div>
+                                <div class="diag-item">
+                                    <span class="diag-label">Server Framework:</span>
+                                    <span class="diag-value">FastAPI 0.115 + Uvicorn</span>
+                                </div>
+                                <div class="diag-item">
+                                    <span class="diag-label">Automated Tests:</span>
+                                    <span class="diag-value">170 Pytest Unit/API Tests Passing</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- 1. SINGLE PATIENT PREDICTION TAB -->
             <div id="tab-single-panel" class="tab-panel active" role="tabpanel" aria-labelledby="tab-single-btn">
@@ -91,7 +179,7 @@
                     <div class="panel-card form-panel">
                         <div class="panel-header">
                             <h2>Patient Clinical Parameters</h2>
-                            <p class="panel-subtitle">Enter observation parameters matching the 10 model feature requirements.</p>
+                            <p class="panel-subtitle">Enter observation parameters matching the 10 required model features.</p>
                         </div>
 
                         <form id="singlePredictionForm" novalidate>
@@ -107,121 +195,121 @@
                                     <!-- Field: Age -->
                                     <div class="input-control" id="control-age">
                                         <label for="age">Age (years) <span class="req-star">*</span></label>
-                                        <input type="number" id="age" name="age" min="1" max="120" value="55" required aria-describedby="hint-age">
+                                        <input type="number" id="age" name="age" min="1" max="120" value="55" required aria-describedby="hint-age err-age">
                                         <span class="input-hint" id="hint-age">Allowed: 1 – 120 years</span>
-                                        <span class="field-err" id="err-age"></span>
+                                        <span class="field-err" id="err-age" role="alert"></span>
                                     </div>
 
                                     <!-- Field: Sex -->
                                     <div class="input-control" id="control-sex">
                                         <label for="sex">Biological Sex <span class="req-star">*</span></label>
-                                        <select id="sex" name="sex" required aria-describedby="hint-sex">
+                                        <select id="sex" name="sex" required aria-describedby="hint-sex err-sex">
                                             <option value="Male" selected>Male</option>
                                             <option value="Female">Female</option>
                                         </select>
-                                        <span class="input-hint" id="hint-sex">Canonical API value</span>
-                                        <span class="field-err" id="err-sex"></span>
+                                        <span class="input-hint" id="hint-sex">Canonical API string</span>
+                                        <span class="field-err" id="err-sex" role="alert"></span>
                                     </div>
 
                                 </div>
                             </fieldset>
 
-                            <!-- GROUP 2: CLINICAL MEASUREMENTS -->
+                            <!-- GROUP 2: CARDIOVASCULAR VITALS -->
                             <fieldset class="form-group-fieldset">
                                 <legend class="group-title">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/></svg>
-                                    Clinical Measurements
-                                </legend>
-                                <div class="field-grid grid-2-col">
-
-                                    <!-- Field: Resting BP (trestbps) -->
-                                    <div class="input-control" id="control-trestbps">
-                                        <label for="trestbps">Resting BP (mm Hg) <span class="req-star">*</span></label>
-                                        <input type="number" id="trestbps" name="trestbps" min="0" max="300" value="140" required aria-describedby="hint-trestbps">
-                                        <span class="input-hint" id="hint-trestbps">Allowed: 0 – 300 mm Hg</span>
-                                        <span class="field-err" id="err-trestbps"></span>
-                                    </div>
-
-                                    <!-- Field: Serum Cholesterol (chol) -->
-                                    <div class="input-control" id="control-chol">
-                                        <label for="chol">Serum Cholesterol (mg/dl) <span class="req-star">*</span></label>
-                                        <input type="number" id="chol" name="chol" min="0" max="1500" value="250" required aria-describedby="hint-chol">
-                                        <span class="input-hint" id="hint-chol">0 = unrecorded (imputed by model)</span>
-                                        <span class="field-err" id="err-chol"></span>
-                                    </div>
-
-                                    <!-- Field: Max Heart Rate (thalch) -->
-                                    <div class="input-control" id="control-thalch">
-                                        <label for="thalch">Max Heart Rate (bpm) <span class="req-star">*</span></label>
-                                        <input type="number" id="thalch" name="thalch" min="1" max="250" value="150" required aria-describedby="hint-thalch">
-                                        <span class="input-hint" id="hint-thalch">Allowed: 1 – 250 bpm</span>
-                                        <span class="field-err" id="err-thalch"></span>
-                                    </div>
-
-                                    <!-- Field: ST Depression (oldpeak) -->
-                                    <div class="input-control" id="control-oldpeak">
-                                        <label for="oldpeak">ST Depression (oldpeak) <span class="req-star">*</span></label>
-                                        <input type="number" id="oldpeak" name="oldpeak" min="-10.0" max="15.0" step="0.1" value="1.2" required aria-describedby="hint-oldpeak">
-                                        <span class="input-hint" id="hint-oldpeak">Allowed: -10.0 – 15.0 mm</span>
-                                        <span class="field-err" id="err-oldpeak"></span>
-                                    </div>
-
-                                </div>
-                            </fieldset>
-
-                            <!-- GROUP 3: CLINICAL INDICATORS -->
-                            <fieldset class="form-group-fieldset">
-                                <legend class="group-title">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    Clinical Indicators & Tests
+                                    Cardiovascular Vitals
                                 </legend>
                                 <div class="field-grid grid-2-col">
 
                                     <!-- Field: Chest Pain Type (cp) -->
                                     <div class="input-control" id="control-cp">
                                         <label for="cp">Chest Pain Type (cp) <span class="req-star">*</span></label>
-                                        <select id="cp" name="cp" required aria-describedby="hint-cp">
+                                        <select id="cp" name="cp" required aria-describedby="hint-cp err-cp">
                                             <option value="asymptomatic" selected>asymptomatic</option>
                                             <option value="non-anginal">non-anginal</option>
                                             <option value="typical angina">typical angina</option>
                                             <option value="atypical angina">atypical angina</option>
                                         </select>
-                                        <span class="input-hint" id="hint-cp">Exact API categorical string</span>
-                                        <span class="field-err" id="err-cp"></span>
+                                        <span class="input-hint" id="hint-cp">Categorical string</span>
+                                        <span class="field-err" id="err-cp" role="alert"></span>
+                                    </div>
+
+                                    <!-- Field: Resting BP (trestbps) -->
+                                    <div class="input-control" id="control-trestbps">
+                                        <label for="trestbps">Resting BP (mm Hg) <span class="req-star">*</span></label>
+                                        <input type="number" id="trestbps" name="trestbps" min="0" max="300" value="140" required aria-describedby="hint-trestbps err-trestbps">
+                                        <span class="input-hint" id="hint-trestbps">Allowed: 0 – 300 mm Hg</span>
+                                        <span class="field-err" id="err-trestbps" role="alert"></span>
+                                    </div>
+
+                                    <!-- Field: Serum Cholesterol (chol) -->
+                                    <div class="input-control" id="control-chol">
+                                        <label for="chol">Serum Cholesterol (mg/dl) <span class="req-star">*</span></label>
+                                        <input type="number" id="chol" name="chol" min="0" max="1500" value="250" required aria-describedby="hint-chol err-chol">
+                                        <span class="input-hint" id="hint-chol">0 = unrecorded (imputed by model)</span>
+                                        <span class="field-err" id="err-chol" role="alert"></span>
                                     </div>
 
                                     <!-- Field: Fasting Blood Sugar (fbs) -->
                                     <div class="input-control" id="control-fbs">
                                         <label for="fbs">Fasting Blood Sugar > 120 mg/dl <span class="req-star">*</span></label>
-                                        <select id="fbs" name="fbs" required aria-describedby="hint-fbs">
+                                        <select id="fbs" name="fbs" required aria-describedby="hint-fbs err-fbs">
                                             <option value="false" selected>False (≤ 120 mg/dl)</option>
                                             <option value="true">True (> 120 mg/dl)</option>
                                         </select>
                                         <span class="input-hint" id="hint-fbs">Boolean classification flag</span>
-                                        <span class="field-err" id="err-fbs"></span>
+                                        <span class="field-err" id="err-fbs" role="alert"></span>
                                     </div>
+
+                                </div>
+                            </fieldset>
+
+                            <!-- GROUP 3: CARDIAC TEST RESULTS -->
+                            <fieldset class="form-group-fieldset">
+                                <legend class="group-title">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Cardiac Test Results
+                                </legend>
+                                <div class="field-grid grid-2-col">
 
                                     <!-- Field: Resting ECG (restecg) -->
                                     <div class="input-control" id="control-restecg">
                                         <label for="restecg">Resting ECG Result <span class="req-star">*</span></label>
-                                        <select id="restecg" name="restecg" required aria-describedby="hint-restecg">
+                                        <select id="restecg" name="restecg" required aria-describedby="hint-restecg err-restecg">
                                             <option value="normal" selected>normal</option>
                                             <option value="st-t abnormality">st-t abnormality</option>
                                             <option value="lv hypertrophy">lv hypertrophy</option>
                                         </select>
-                                        <span class="input-hint" id="hint-restecg">Exact API categorical string</span>
-                                        <span class="field-err" id="err-restecg"></span>
+                                        <span class="input-hint" id="hint-restecg">Categorical string</span>
+                                        <span class="field-err" id="err-restecg" role="alert"></span>
+                                    </div>
+
+                                    <!-- Field: Max Heart Rate (thalch) -->
+                                    <div class="input-control" id="control-thalch">
+                                        <label for="thalch">Max Heart Rate (bpm) <span class="req-star">*</span></label>
+                                        <input type="number" id="thalch" name="thalch" min="1" max="250" value="150" required aria-describedby="hint-thalch err-thalch">
+                                        <span class="input-hint" id="hint-thalch">Allowed: 1 – 250 bpm</span>
+                                        <span class="field-err" id="err-thalch" role="alert"></span>
                                     </div>
 
                                     <!-- Field: Exercise Induced Angina (exang) -->
                                     <div class="input-control" id="control-exang">
                                         <label for="exang">Exercise-Induced Angina <span class="req-star">*</span></label>
-                                        <select id="exang" name="exang" required aria-describedby="hint-exang">
+                                        <select id="exang" name="exang" required aria-describedby="hint-exang err-exang">
                                             <option value="false" selected>False (No)</option>
                                             <option value="true">True (Yes)</option>
                                         </select>
                                         <span class="input-hint" id="hint-exang">Boolean classification flag</span>
-                                        <span class="field-err" id="err-exang"></span>
+                                        <span class="field-err" id="err-exang" role="alert"></span>
+                                    </div>
+
+                                    <!-- Field: ST Depression (oldpeak) -->
+                                    <div class="input-control" id="control-oldpeak">
+                                        <label for="oldpeak">ST Depression (oldpeak) <span class="req-star">*</span></label>
+                                        <input type="number" id="oldpeak" name="oldpeak" min="-10.0" max="15.0" step="0.1" value="1.2" required aria-describedby="hint-oldpeak err-oldpeak">
+                                        <span class="input-hint" id="hint-oldpeak">Allowed: -10.0 – 15.0 mm</span>
+                                        <span class="field-err" id="err-oldpeak" role="alert"></span>
                                     </div>
 
                                 </div>
@@ -243,8 +331,8 @@
                         </form>
                     </div>
 
-                    <!-- RIGHT COLUMN: RESULT PANEL -->
-                    <div class="panel-card result-panel" id="resultCardPanel">
+                    <!-- RIGHT COLUMN: STICKY RESULT PANEL -->
+                    <div class="panel-card result-panel" id="resultCardPanel" role="region" aria-label="Prediction results" aria-live="polite">
                         
                         <!-- STATE 1: INITIAL IDLE -->
                         <div class="state-container state-idle" id="stateIdle">
@@ -252,14 +340,14 @@
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
                             <h3>Awaiting Input Parameters</h3>
-                            <p>Adjust the clinical features on the left panel and click <strong>Run Prediction</strong> to execute model inference via the FastAPI service.</p>
+                            <p>Adjust clinical parameters on the left panel and click <strong>Run Prediction</strong> to execute model inference via the FastAPI REST microservice.</p>
                         </div>
 
                         <!-- STATE 2: LOADING -->
                         <div class="state-container state-loading hidden" id="stateLoading">
                             <div class="pulse-loader"></div>
                             <h3>Analyzing Clinical Features...</h3>
-                            <p>Dispatching feature vector to FastAPI <code>POST /predict</code> endpoint...</p>
+                            <p>Dispatching feature vector to FastAPI <code>POST /predict</code> service endpoint...</p>
                         </div>
 
                         <!-- STATE 3: ERROR -->
@@ -292,7 +380,7 @@
                             <!-- PROBABILITY GAUGE BAR -->
                             <div class="probability-block">
                                 <div class="prob-header">
-                                    <span class="prob-title">Model Predicted Probability</span>
+                                    <span class="prob-title">Predicted Probability</span>
                                     <span class="prob-value-text" id="resProbValueText">0.0%</span>
                                 </div>
                                 <div class="prob-track">
@@ -302,6 +390,18 @@
                                     <span>0.0 (Low Risk)</span>
                                     <span>0.5 Decision Boundary</span>
                                     <span>1.0 (High Risk)</span>
+                                </div>
+                            </div>
+
+                            <!-- MODEL CONFIG SUMMARY -->
+                            <div class="model-config-summary">
+                                <div class="config-row">
+                                    <span class="config-key">Classifier Model:</span>
+                                    <span class="config-val">Tuned Support Vector Machine (`SVC`)</span>
+                                </div>
+                                <div class="config-row">
+                                    <span class="config-key">Hyperparameters:</span>
+                                    <span class="config-val">`C=100, kernel=linear, probability=True`</span>
                                 </div>
                             </div>
 
@@ -330,7 +430,7 @@
             <div id="tab-batch-panel" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-batch-btn">
                 <div class="panel-card">
                     <div class="panel-header">
-                        <h2>Batch Prediction Interface</h2>
+                        <h2>Batch Inference Interface</h2>
                         <p class="panel-subtitle">Execute parallel predictions across multiple patient observations using <code>POST /predict/batch</code>.</p>
                     </div>
 
@@ -354,6 +454,15 @@
                         </button>
                     </div>
 
+                    <!-- BATCH ERROR BLOCK -->
+                    <div class="batch-error-block hidden" id="batchErrorBlock" role="alert">
+                        <div class="error-badge-icon">!</div>
+                        <div class="batch-err-content">
+                            <h4 id="batchErrorHeader">Batch Request Error</h4>
+                            <p id="batchErrorBody">Invalid JSON structure or validation failure.</p>
+                        </div>
+                    </div>
+
                     <!-- BATCH RESULTS DISPLAY -->
                     <div class="batch-results-block hidden" id="batchResultsBlock">
                         <h3>Batch Inference Results</h3>
@@ -366,7 +475,7 @@
                                         <th>Chest Pain</th>
                                         <th>Vitals (BP / Chol)</th>
                                         <th>Predicted Class</th>
-                                        <th>Model Probability</th>
+                                        <th>Predicted Probability</th>
                                         <th>Model</th>
                                     </tr>
                                 </thead>
@@ -387,7 +496,7 @@
                     <!-- HELD-OUT TEST METRICS -->
                     <div class="panel-card">
                         <div class="panel-header">
-                            <h2>Held-Out Test Set Metrics ($N=184$)</h2>
+                            <h2>Verified Held-Out Test Set Metrics ($N=184$)</h2>
                             <p class="panel-subtitle">Empirical performance metrics computed on the isolated held-out test dataset (stratified 80/20 train/test split).</p>
                         </div>
 
@@ -403,7 +512,7 @@
                                 <span class="metric-detail">89 / 104 True Positives</span>
                             </div>
                             <div class="metric-box accent-box">
-                                <span class="metric-name">Recall (Sensitivity)</span>
+                                <span class="metric-name">Sensitivity (Recall)</span>
                                 <span class="metric-num">87.25%</span>
                                 <span class="metric-detail">89 / 102 Actual Positives</span>
                             </div>
@@ -413,19 +522,19 @@
                                 <span class="metric-detail">67 / 82 Actual Negatives</span>
                             </div>
                             <div class="metric-box">
-                                <span class="metric-name">F1-Score</span>
-                                <span class="metric-num">0.8641</span>
-                                <span class="metric-detail">Harmonic Mean</span>
+                                <span class="metric-name">F1 Score</span>
+                                <span class="metric-num">86.41%</span>
+                                <span class="metric-detail">0.8641 Harmonic Mean</span>
                             </div>
                             <div class="metric-box accent-box">
                                 <span class="metric-name">ROC-AUC</span>
-                                <span class="metric-num">0.9295</span>
-                                <span class="metric-detail">Class Discrimination</span>
+                                <span class="metric-num">92.95%</span>
+                                <span class="metric-detail">0.9295 Discrimination</span>
                             </div>
                             <div class="metric-box">
                                 <span class="metric-name">PR-AUC</span>
-                                <span class="metric-num">0.9455</span>
-                                <span class="metric-detail">Precision-Recall Area</span>
+                                <span class="metric-num">94.55%</span>
+                                <span class="metric-detail">0.9455 Precision-Recall Area</span>
                             </div>
                         </div>
                     </div>
@@ -455,7 +564,7 @@
                                 <div class="cm-quad cm-tp">
                                     <span class="cm-label">TRUE POSITIVE (TP)</span>
                                     <span class="cm-number">89</span>
-                                    <span class="cm-desc">87.25% Recall / Sensitivity</span>
+                                    <span class="cm-desc">87.25% Sensitivity / Recall</span>
                                 </div>
                             </div>
                         </div>
@@ -479,12 +588,66 @@
                                     <span class="spec-val">Median Imputation + StandardScaler + OneHotEncoder</span>
                                 </div>
                                 <div class="spec-row">
-                                    <span class="spec-key">Benchmarked Models:</span>
-                                    <span class="spec-val">Logistic Regression, K-NN, Decision Tree, Random Forest, SVM</span>
-                                </div>
-                                <div class="spec-row">
                                     <span class="spec-key">Validation Method:</span>
                                     <span class="spec-val">5-Fold Stratified GridSearchCV</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PIPELINE VISUALIZATION CARD -->
+                    <div class="panel-card">
+                        <div class="panel-header">
+                            <h2>End-to-End System Architecture Pipeline</h2>
+                            <p class="panel-subtitle">Leakage-isolated processing flow from raw feature observation to FastAPI inference prediction.</p>
+                        </div>
+
+                        <div class="pipeline-flow">
+                            <div class="pipe-step">
+                                <div class="step-num">1</div>
+                                <div class="step-card">
+                                    <div class="step-title">Clinical Input</div>
+                                    <div class="step-desc">10 raw observation features (`age`, `sex`, `cp`, `trestbps`, `chol`, `fbs`, `restecg`, `thalch`, `exang`, `oldpeak`)</div>
+                                </div>
+                            </div>
+
+                            <div class="pipe-arrow" aria-hidden="true">↓</div>
+
+                            <div class="pipe-step">
+                                <div class="step-num">2</div>
+                                <div class="step-card">
+                                    <div class="step-title">Validation</div>
+                                    <div class="step-desc">FastAPI Pydantic schema validation (`app/schemas.py`) enforcing bounds without stack trace exposure.</div>
+                                </div>
+                            </div>
+
+                            <div class="pipe-arrow" aria-hidden="true">↓</div>
+
+                            <div class="pipe-step">
+                                <div class="step-num">3</div>
+                                <div class="step-card">
+                                    <div class="step-title">Preprocessing</div>
+                                    <div class="step-desc">Median Imputation (`chol=0 -> nan`) + StandardScaler + OneHotEncoder (fitted strictly on training set `X_train`).</div>
+                                </div>
+                            </div>
+
+                            <div class="pipe-arrow" aria-hidden="true">↓</div>
+
+                            <div class="pipe-step">
+                                <div class="step-num">4</div>
+                                <div class="step-card">
+                                    <div class="step-title">Tuned SVM</div>
+                                    <div class="step-desc">Persisted Trained SVM Pipeline (`models/final_model.joblib`): `SVC(C=100, kernel="linear", probability=True)`.</div>
+                                </div>
+                            </div>
+
+                            <div class="pipe-arrow" aria-hidden="true">↓</div>
+
+                            <div class="pipe-step">
+                                <div class="step-num">5</div>
+                                <div class="step-card">
+                                    <div class="step-title">Prediction</div>
+                                    <div class="step-desc">Returns structured JSON containing `predicted_class` (0 or 1), `predicted_probability`, and `model_name`.</div>
                                 </div>
                             </div>
                         </div>
@@ -493,92 +656,52 @@
                 </div>
             </div>
 
-            <!-- 4. SYSTEM ARCHITECTURE & PIPELINE TAB -->
-            <div id="tab-pipeline-panel" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-pipeline-btn">
+            <!-- 4. API & DOCS TAB -->
+            <div id="tab-api-panel" class="tab-panel hidden" role="tabpanel" aria-labelledby="tab-api-btn">
                 <div class="panel-card">
                     <div class="panel-header">
-                        <h2>End-to-End System Architecture Pipeline</h2>
-                        <p class="panel-subtitle">Leakage-isolated processing flow from raw feature observation to FastAPI inference prediction.</p>
+                        <h2>FastAPI REST Microservice Endpoints</h2>
+                        <p class="panel-subtitle">Production-ready HTTP REST API contracts for single and batch predictions.</p>
                     </div>
 
-                    <!-- HTML/CSS PIPELINE FLOW DIAGRAM -->
-                    <div class="pipeline-diagram-wrapper">
-                        <div class="pipeline-flow">
-                            
-                            <div class="pipe-step">
-                                <div class="step-num">1</div>
-                                <div class="step-card">
-                                    <div class="step-title">Clinical Features Input</div>
-                                    <div class="step-desc">10 raw observation features (`age`, `sex`, `cp`, `trestbps`, `chol`, `fbs`, `restecg`, `thalch`, `exang`, `oldpeak`)</div>
-                                </div>
-                            </div>
+                    <div class="api-docs-header-action">
+                        <a href="/docs" target="_blank" rel="noopener noreferrer" class="btn btn-action-primary">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                            <span>Open Interactive OpenAPI Swagger Docs (/docs)</span>
+                        </a>
+                    </div>
 
-                            <div class="pipe-arrow">↓</div>
-
-                            <div class="pipe-step">
-                                <div class="step-num">2</div>
-                                <div class="step-card">
-                                    <div class="step-title">FastAPI Pydantic Validation</div>
-                                    <div class="step-desc">Strict schema validation (`app/schemas.py`) enforcing canonical bounds without raw stack trace exposure.</div>
-                                </div>
-                            </div>
-
-                            <div class="pipe-arrow">↓</div>
-
-                            <div class="pipe-step">
-                                <div class="step-num">3</div>
-                                <div class="step-card">
-                                    <div class="step-title">Leakage-Isolated Preprocessing</div>
-                                    <div class="step-desc">Median Imputation (`chol=0 -> nan`) + StandardScaler + OneHotEncoder (fitted strictly on training set `X_train`).</div>
-                                </div>
-                            </div>
-
-                            <div class="pipe-arrow">↓</div>
-
-                            <div class="pipe-step">
-                                <div class="step-num">4</div>
-                                <div class="step-card">
-                                    <div class="step-title">Persisted Trained SVM Pipeline</div>
-                                    <div class="step-desc">Loaded from `models/final_model.joblib`: `SVC(C=100, kernel="linear", probability=True)`.</div>
-                                </div>
-                            </div>
-
-                            <div class="pipe-arrow">↓</div>
-
-                            <div class="pipe-step">
-                                <div class="step-num">5</div>
-                                <div class="step-card">
-                                    <div class="step-title">Prediction Response Output</div>
-                                    <div class="step-desc">Returns structured JSON containing `predicted_class` (0 or 1), `predicted_probability`, and `model_name`.</div>
-                                </div>
-                            </div>
-
+                    <div class="api-endpoints-grid">
+                        
+                        <!-- GET / -->
+                        <div class="api-card">
+                            <div class="api-method-badge get">GET</div>
+                            <div class="api-endpoint-path"><code>/</code></div>
+                            <p class="api-endpoint-desc">Returns root API metadata including title, version, and model name.</p>
                         </div>
-                    </div>
 
-                    <!-- REAL-TIME SERVICE STATUS CARD -->
-                    <div class="service-status-summary-card">
-                        <h3>FastAPI Service Diagnostics</h3>
-                        <div class="diag-grid">
-                            <div class="diag-item">
-                                <span class="diag-label">API Status:</span>
-                                <span class="diag-value" id="diagApiStatus">Online</span>
-                            </div>
-                            <div class="diag-item">
-                                <span class="diag-label">Model Pipeline:</span>
-                                <span class="diag-value" id="diagModelLoaded">Loaded (final_model.joblib)</span>
-                            </div>
-                            <div class="diag-item">
-                                <span class="diag-label">Framework:</span>
-                                <span class="diag-value">FastAPI + Uvicorn</span>
-                            </div>
-                            <div class="diag-item">
-                                <span class="diag-label">Test Suite Status:</span>
-                                <span class="diag-value">170 Automated Pytest Tests Passing</span>
-                            </div>
+                        <!-- GET /health -->
+                        <div class="api-card">
+                            <div class="api-method-badge get">GET</div>
+                            <div class="api-endpoint-path"><code>/health</code></div>
+                            <p class="api-endpoint-desc">Health check endpoint returning service status and model loading confirmation.</p>
                         </div>
-                    </div>
 
+                        <!-- POST /predict -->
+                        <div class="api-card">
+                            <div class="api-method-badge post">POST</div>
+                            <div class="api-endpoint-path"><code>/predict</code></div>
+                            <p class="api-endpoint-desc">Accepts 10 clinical observation features and returns predicted class and predicted probability.</p>
+                        </div>
+
+                        <!-- POST /predict/batch -->
+                        <div class="api-card">
+                            <div class="api-method-badge post">POST</div>
+                            <div class="api-endpoint-path"><code>/predict/batch</code></div>
+                            <p class="api-endpoint-desc">Accepts array of observation records and returns parallel batch prediction results.</p>
+                        </div>
+
+                    </div>
                 </div>
             </div>
 
@@ -597,7 +720,7 @@
                     <span>FastAPI</span>
                 </div>
                 <div class="footer-right">
-                    <span>Research Prototype & Portfolio Demonstration</span>
+                    <span>Engineering Research Prototype & Portfolio Showcase</span>
                 </div>
             </div>
         </footer>
