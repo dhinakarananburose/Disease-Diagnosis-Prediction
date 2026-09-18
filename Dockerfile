@@ -14,10 +14,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Create non-root user for security
 RUN useradd -m -u 1000 appuser
 
-# Copy application source code and persisted model artifacts
+# Copy application source code, frontend UI, and persisted model artifacts
 COPY app/ ./app/
 COPY src/ ./src/
 COPY models/ ./models/
+COPY frontend/ ./frontend/
 
 # Set appropriate permissions
 RUN chown -R appuser:appuser /app

@@ -27,6 +27,9 @@ const elements = {
     predictBtnIcon: document.getElementById("predictBtnIcon"),
     predictBtnSpinner: document.getElementById("predictBtnSpinner"),
     btnReset: document.getElementById("btnReset"),
+    btnPresetLow: document.getElementById("btnPresetLow"),
+    btnPresetHigh: document.getElementById("btnPresetHigh"),
+    resultCardPanel: document.getElementById("resultCardPanel"),
 
     // Result Card State Containers
     stateIdle: document.getElementById("stateIdle"),
@@ -168,6 +171,41 @@ function initFormHandlers() {
     if (elements.btnRetryRequest) {
         elements.btnRetryRequest.addEventListener("click", handleFormSubmission);
     }
+    if (elements.btnPresetLow) {
+        elements.btnPresetLow.addEventListener("click", () => loadPresetProfile("low"));
+    }
+    if (elements.btnPresetHigh) {
+        elements.btnPresetHigh.addEventListener("click", () => loadPresetProfile("high"));
+    }
+}
+
+function loadPresetProfile(profileType) {
+    clearFieldErrors();
+
+    if (elements.btnPresetLow) elements.btnPresetLow.classList.remove("active");
+    if (elements.btnPresetHigh) elements.btnPresetHigh.classList.remove("active");
+
+    const data = (profileType === "low") ? {
+        age: 42, sex: "Female", cp: "typical angina", trestbps: 120, chol: 195,
+        fbs: "false", restecg: "normal", thalch: 165, exang: "false", oldpeak: 0.0
+    } : {
+        age: 65, sex: "Male", cp: "asymptomatic", trestbps: 150, chol: 260,
+        fbs: "false", restecg: "st-t abnormality", thalch: 125, exang: "true", oldpeak: 2.5
+    };
+
+    document.getElementById("age").value = data.age;
+    document.getElementById("sex").value = data.sex;
+    document.getElementById("cp").value = data.cp;
+    document.getElementById("trestbps").value = data.trestbps;
+    document.getElementById("chol").value = data.chol;
+    document.getElementById("fbs").value = data.fbs;
+    document.getElementById("restecg").value = data.restecg;
+    document.getElementById("thalch").value = data.thalch;
+    document.getElementById("exang").value = data.exang;
+    document.getElementById("oldpeak").value = data.oldpeak;
+
+    if (profileType === "low" && elements.btnPresetLow) elements.btnPresetLow.classList.add("active");
+    if (profileType === "high" && elements.btnPresetHigh) elements.btnPresetHigh.classList.add("active");
 }
 
 function collectFormData() {
@@ -297,6 +335,15 @@ async function handleFormSubmission(event) {
             const resultData = await response.json();
             renderPredictionResult(resultData, payload);
             showResultState("success");
+
+            // Auto-scroll to result panel on mobile viewports (< 1024px)
+            if (window.innerWidth < 1024 && elements.resultCardPanel) {
+                const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+                elements.resultCardPanel.scrollIntoView({
+                    behavior: prefersReducedMotion ? "auto" : "smooth",
+                    block: "start"
+                });
+            }
         } else {
             let errorText = `HTTP Error ${response.status}`;
             try {
@@ -391,6 +438,8 @@ function resetForm() {
     if (elements.singlePredictionForm) {
         elements.singlePredictionForm.reset();
     }
+    if (elements.btnPresetLow) elements.btnPresetLow.classList.remove("active");
+    if (elements.btnPresetHigh) elements.btnPresetHigh.classList.remove("active");
     clearFieldErrors();
     showResultState("idle");
 }
